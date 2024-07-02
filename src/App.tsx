@@ -34,16 +34,16 @@ function App() {
               <PlusCircle /> <span>Add Task</span>
             </button>
           </div>
-          <div className="mt-2 overflow-hidden rounded-md bg-white shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)]">
-            <TaskList />
-            <AnimatePresence mode="wait">
-              {isEditModalOpen && <EditTask />}
-            </AnimatePresence>
-            <AnimatePresence mode="wait">
-              {isAddModalOpen && <AddTask />}
-            </AnimatePresence>
-          </div>
+          {/* <div className="mt-2 overflow-hidden rounded-md bg-white shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)]"> */}
+          <TaskList />
+          <AnimatePresence mode="wait">
+            {isEditModalOpen && <EditTask />}
+          </AnimatePresence>
+          <AnimatePresence mode="wait">
+            {isAddModalOpen && <AddTask />}
+          </AnimatePresence>
         </div>
+        {/* </div> */}
       </section>
     </main>
   );

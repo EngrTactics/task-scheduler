@@ -1,11 +1,11 @@
 export type Task = {
-  time: string;
-  title: string;
-  count: number;
-  message: string;
-  platform: "Whatsapp" | "Telegram" | "Slack" | "Email";
-  recipients: string[];
+  id: string;
   runTime: string;
+  title: string;
+  message: string;
+  platform: "whatsapp" | "telegram" | "slack" | "email";
+  recipients: string[];
+
   runDate: string;
   repeat: Repeat;
   finalDate: string;

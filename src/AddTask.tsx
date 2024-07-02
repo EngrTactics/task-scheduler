@@ -7,12 +7,14 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from "./components/ui/form";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "./components/ui/popover";
+import { v4 as uuidv4 } from "uuid";
 import { Button } from "./components/ui/button";
 import { CalendarIcon, PlusCircle } from "lucide-react";
 import { Calendar } from "./components/ui/calender";
@@ -21,6 +23,7 @@ import { cn } from "./lib/utils";
 import { useForm } from "react-hook-form";
 import { Textarea } from "./components/ui/textarea";
 import { useState } from "react";
+import { z } from "zod";
 import {
   Select,
   SelectContent,
@@ -35,11 +38,25 @@ import { useDispatch } from "react-redux";
 import { addTask } from "./redux/tasks/tasksAction";
 import { Task } from "./types";
 import { Switch } from "./components/ui/switch";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const validationSchema = z.object({
+  time: z
+    .string()
+    .min(1, "Run time is required")
+    .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Run time must be in HH:mm format")
+    .refine((runTime) => {
+      const now = new Date();
+      const runTimeDate = new Date(now.toDateString() + " " + runTime);
+      return runTimeDate.getTime() >= now.getTime();
+    }, "Time cannot be in the past"),
+  messageTitle: z.string().nonempty("Message title is required"),
+});
 
 const AddTask = () => {
   const defaultValues = {
     time: "",
-    scheduleDate: new Date(),
+    scheduleDate: new Date().setHours(0, 0, 0, 0),
     messageTitle: "",
     message: "",
     recipients: [""],
@@ -49,7 +66,9 @@ const AddTask = () => {
     finalDate: new Date(),
   };
   const form = useForm({
+    mode: "onTouched",
     defaultValues,
+    resolver: zodResolver(validationSchema),
   });
   const dispatch = useDispatch();
   const [recipient, setRecipient] = useState<string>();
@@ -63,16 +82,16 @@ const AddTask = () => {
       form.setValue("recipients", recipients);
     }
   };
-  const handleSubmit = (data: any) => {
+  const handleSubmit = (data: typeof defaultValues) => {
     console.log(data);
     const taskToAdd = {
+      id: uuidv4(),
       time: data.time,
       title: data.messageTitle,
-      count: 2,
       message: data.message,
       platform: data.platform,
       recipients: data.recipients,
-      runTime: data.scheduleDate,
+      runTime: data.time,
       repeat: {
         active: data.repeatActive,
         value: {
@@ -80,10 +99,11 @@ const AddTask = () => {
           unit: "days",
         },
       },
-      finalDate: data.finalDate,
-      runDate: data.scheduleDate,
+      finalDate: data.finalDate.toISOString(),
+      runDate: data.scheduleDate.toISOString(),
     };
     dispatch(addTask(taskToAdd as any));
+    dispatch(closeAddModal());
   };
 
   return (
@@ -92,30 +112,27 @@ const AddTask = () => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
-      onClick={() => {
-        dispatch(closeAddModal());
-      }}
-      className="fixed inset-0 flex items-center justify-center bg-black/65 backdrop-blur"
+      // onClick={() => {
+      //   dispatch(closeAddModal());
+      // }}
+      className="fixed inset-0 z-30 flex items-center justify-center bg-black/65 backdrop-blur"
     >
       <motion.div
         initial={{ scale: 0.5 }}
         animate={{ scale: 1 }}
         exit={{ scale: 0.2 }}
         transition={{ duration: 0.3 }}
-        className="w-[400px] rounded-md bg-white p-4"
-        onClick={(e) => {
-          e.stopPropagation();
-          e.preventDefault();
-        }}
+        className="max-h-screen w-[400px] overflow-scroll rounded-md bg-white p-4"
+        // onClick={(e) => {
+        //   e.stopPropagation();
+        //   e.preventDefault();
+        // }}
       >
         <h1 className="mb-1 font-bold">Add Task</h1>
         <Separator className="mx-auto" />
         <Form {...form}>
           <form
-            onSubmit={() => {
-              console.log("something");
-              form.handleSubmit(handleSubmit);
-            }}
+            onSubmit={form.handleSubmit(handleSubmit)}
             className="px-4 pt-4"
           >
             <div className="flex flex-col space-y-4">
@@ -130,6 +147,7 @@ const AddTask = () => {
                       <FormControl>
                         <Input type="time" {...field} />
                       </FormControl>
+                      <FormMessage className="text-xs" />
                     </FormItem>
                   )}
                 />
@@ -151,7 +169,10 @@ const AddTask = () => {
                                   !field.value && "text-muted-foreground",
                                 )}
                               >
-                                {field.value ? (
+                                {field.value ==
+                                new Date().setHours(0, 0, 0, 0) ? (
+                                  <span>Today</span>
+                                ) : field.value ? (
                                   format(field.value, "PPP")
                                 ) : (
                                   <span>Pick a date</span>
@@ -207,40 +228,34 @@ const AddTask = () => {
               />
               {/* Recipient field */}
 
-              <FormItem className="flex min-w-[20rem] flex-col space-y-1">
+              <div className="flex min-w-[20rem] flex-col space-y-1">
                 <Label className="text-sm" htmlFor="recipient">
                   Recipient(s)
                 </Label>
-                <FormControl>
-                  <div className="flex w-full flex-wrap items-center space-x-3 rounded-md border border-gray-300 p-2 text-sm">
-                    {recipients.map((recipient, index) => (
-                      <div
-                        className="rounded-md bg-slate-800 px-3 py-1 text-white"
-                        key={index}
-                      >
-                        {recipient}
-                      </div>
-                    ))}
+
+                <div className="flex w-full flex-wrap items-center space-x-3 rounded-md border border-gray-300 p-2 text-sm">
+                  {recipients.map((recipient, index) => (
                     <div
-                      id="recipient"
-                      className="min-w-32 rounded-md border border-gray-400 px-3 py-1 outline-none hover:border-gray-600 focus:border-gray-800"
-                      contentEditable
-                      suppressContentEditableWarning
-                      onBlur={(e) =>
-                        setRecipient(e.currentTarget.textContent || "")
-                      }
+                      className="rounded-md bg-slate-800 px-3 py-1 text-white"
+                      key={index}
                     >
                       {recipient}
                     </div>
-                    <button
-                      className="top-5 transition-all duration-100 hover:scale-105 active:scale-100"
-                      onClick={addRecipient}
-                    >
-                      <PlusCircle />
-                    </button>
-                  </div>
-                </FormControl>
-              </FormItem>
+                  ))}
+                  <input
+                    id="recipient"
+                    className="min-w-20 rounded-md border border-gray-400 px-3 py-1 outline-none hover:border-gray-600 focus:border-gray-800"
+                    value={recipient}
+                    onChange={(e) => setRecipient(e.target.value)}
+                  />
+                  <button
+                    className="top-5 transition-all duration-100 hover:scale-105 active:scale-100"
+                    onClick={addRecipient}
+                  >
+                    <PlusCircle />
+                  </button>
+                </div>
+              </div>
 
               <div className="flex justify-between gap-4">
                 <div>
@@ -356,18 +371,19 @@ const AddTask = () => {
                       </FormItem>
                     )}
                   />
+
                   {/* final date field */}
                   <FormField
                     control={form.control}
                     name="finalDate"
                     render={({ field }) => (
-                      <div className="mt-3">
+                      <FormItem className="mt-3">
                         <FormLabel className="mb-3 text-sm">
                           Select final date{" "}
                           <span className="font-thin italic">(optional)</span>
                         </FormLabel>
                         <Popover>
-                          <PopoverTrigger asChild>
+                          <PopoverTrigger disabled={repeatActive} asChild>
                             <FormControl>
                               <Button
                                 variant={"outline"}
@@ -391,7 +407,7 @@ const AddTask = () => {
                               selected={field.value}
                               onSelect={field.onChange}
                               disabled={(date) => {
-                                const today = new Date();
+                                const today = form.getValues().scheduleDate;
                                 today.setHours(0, 0, 0, 0);
                                 return date < today;
                               }}
@@ -399,7 +415,7 @@ const AddTask = () => {
                             />
                           </PopoverContent>
                         </Popover>
-                      </div>
+                      </FormItem>
                     )}
                   />
                 </div>
@@ -418,9 +434,9 @@ const AddTask = () => {
               </button>
               <button
                 type="submit"
-                onClick={() => {
-                  console.log(form.getValues());
-                }}
+                // onClick={(e) => {
+                //   e.preventDefault();
+                // }}
                 className="rounded-full border-2 border-slate-800 bg-slate-800 px-5 py-1 text-white hover:bg-slate-900"
               >
                 Add Task
