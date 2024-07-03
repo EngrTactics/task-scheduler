@@ -1,6 +1,6 @@
 # Message Scheduler Project
 
-This is a React project bootstrapped with Vite.
+This is a React project bootstrapped with Vite. This is a guide on how to run it on your local machine
 
 ## Prerequisites
 
