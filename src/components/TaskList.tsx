@@ -1,26 +1,28 @@
 import TaskItem from "./TaskItem";
-import { Separator } from "./components/ui/separator";
+import { Separator } from "./ui/separator";
 import { groupBy } from "lodash";
 
 import React, { useEffect } from "react";
-import { loadTasks } from "./redux/tasks/tasksAction";
+import {
+  loadTasks,
+  updatePendingAndPastTask,
+} from "../redux/tasks/tasksAction";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "./redux/store";
+import { RootState } from "../redux/store";
 import { format } from "date-fns";
 import noTask from "@/assets/emptyList.svg";
 import { PlusCircle } from "lucide-react";
-import { openAddModal } from "./redux/modal/modalAction";
+import { openAddModal } from "../redux/modal/modalAction";
 
 const TaskList = () => {
   const tasks = useSelector((state: RootState) => {
-    return state.tasks.currentTasks;
+    return state.tasks.pendingTasks;
   });
   const dispatch = useDispatch();
 
   const sortedTasks = [...tasks].sort((a, b) => {
     // Compare by runDate
-    const dateComparison =
-      new Date(a.runDate).getTime() - new Date(b.runDate).getTime();
+    const dateComparison = a.runDate.getTime() - b.runDate.getTime();
     if (dateComparison !== 0) return dateComparison;
 
     // If runDates are equal, compare by runTime
@@ -31,13 +33,14 @@ const TaskList = () => {
   });
 
   const tasksByDate = groupBy(sortedTasks, (task: any) =>
-    new Date(task.runDate).toDateString(),
+    task.runDate.toDateString(),
   );
 
   useEffect(() => {
     dispatch(loadTasks());
+    dispatch(updatePendingAndPastTask());
     console.log(tasks);
-  }, []);
+  }, [dispatch]);
   return (
     <div className="flex flex-col bg-white">
       {/* Task list haading */}

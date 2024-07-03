@@ -1,16 +1,18 @@
 import { ChevronDown, Repeat } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { motion, AnimatePresence, useCycle } from "framer-motion";
-import { cn } from "./lib/utils";
-import { Task } from "./types";
+import { cn } from "../lib/utils";
+import { Task } from "../types";
 import { useDispatch } from "react-redux";
-import { openEditModal, openRunTaskModal } from "./redux/modal/modalAction";
+import { openEditModal, openRunTaskModal } from "../redux/modal/modalAction";
 import { format } from "date-fns";
 import {
   deleteTask,
   updatePendingAndPastTask,
-} from "./redux/tasks/tasksAction";
-import { setRunningTask } from "./redux/tasks/tasksSlice";
+  updateTaskToEdit,
+} from "../redux/tasks/tasksAction";
+import { setRunningTask } from "../redux/tasks/tasksSlice";
+import { useEffect, useState } from "react";
 
 const container = {
   hidden: { height: 0 },
@@ -34,27 +36,62 @@ type TaskProps = {
 };
 
 const TaskItem = ({ task }: TaskProps) => {
+  const [intervalId, setIntervalId] = useState<number | undefined>();
   const [isOpen, toggleOpen] = useCycle(false, true);
   const dispatch = useDispatch();
 
   const now = new Date();
-  const runTime = new Date(
-    new Date(task.runDate).toDateString() + " " + task.runTime,
-  );
+  const runTime = new Date(task.runDate.toDateString() + " " + task.runTime);
+  const determineMs = (task: Task) => {
+    switch (task.repeat.value.value) {
+      case "daily":
+        return 24 * 60 * 60 * 1000;
+
+      case "weekly":
+        return 7 * 24 * 60 * 60 * 1000;
+
+      case "monthly":
+        return 30 * 24 * 60 * 60 * 1000;
+
+      case "custom":
+        return (task.repeat.value.customValue ?? 1) * 60 * 1000;
+    }
+  };
 
   // Calculate the time difference in milliseconds
   const delay = runTime.getTime() - now.getTime();
+  useEffect(() => {
+    // Schedule the task
+    if (delay > 0) {
+      let intervalId: number | undefined;
 
-  // Schedule the task
-  if (delay > 0) {
-    setTimeout(() => {
-      dispatch(setRunningTask(task));
-      dispatch(openRunTaskModal());
-      console.log(`Running task ${task.id}`);
-    }, delay);
-  } else {
-    console.log(`Task ${task.title} is in the past and won't be scheduled`);
-  }
+      if (task.repeat.active) {
+        // If the task should repeat, use setTimeout to schedule the first run
+        setTimeout(() => {
+          // Run the task
+          dispatch(setRunningTask(task));
+          dispatch(openRunTaskModal());
+          console.log(`Running task ${task.id}`, determineMs(task));
+
+          // Then use setInterval to schedule the repeating runs
+          intervalId = window.setInterval(() => {
+            dispatch(setRunningTask(task));
+            dispatch(openRunTaskModal());
+            console.log(`Running task ${task.id}`, determineMs(task));
+          }, determineMs(task));
+
+          setIntervalId(intervalId);
+        }, delay);
+      }
+
+      setIntervalId(intervalId);
+      return () => {
+        if (intervalId) {
+          window.clearInterval(intervalId);
+        }
+      };
+    }
+  }, [task]);
   return (
     <div
       onClick={() => {
@@ -144,7 +181,6 @@ const TaskItem = ({ task }: TaskProps) => {
                 <div className="flex items-center gap-2">
                   <div className="font-bold">Runtime:</div>
                   <p>{format(new Date(runTime), "MMMM do")}</p>
-                  {/* <p>{task.runDate}</p> */}
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="font-bold">Repeat:</div>
@@ -154,7 +190,9 @@ const TaskItem = ({ task }: TaskProps) => {
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="font-bold">Final Date:</div>
-                  <p>{format(new Date(task.finalDate), "MMMM do")}</p>
+                  <p>
+                    {task.finalDate ? format(task.finalDate, "MMMM do") : "N/A"}
+                  </p>
                 </div>
               </div>
             </div>
@@ -162,6 +200,7 @@ const TaskItem = ({ task }: TaskProps) => {
             <div className="flex items-center justify-end gap-5 p-4">
               <button
                 onClick={() => {
+                  dispatch(updateTaskToEdit(task));
                   dispatch(openEditModal());
                 }}
                 className="rounded-full bg-slate-800 px-5 py-1.5 text-white hover:bg-slate-900"

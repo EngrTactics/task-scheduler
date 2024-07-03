@@ -5,16 +5,15 @@ export type Task = {
   message: string;
   platform: "whatsapp" | "telegram" | "slack" | "email";
   recipients: string[];
-
-  runDate: string;
+  runDate: Date;
   repeat: Repeat;
-  finalDate: string;
+  finalDate?: Date;
 };
 
 type Repeat = {
   active: boolean;
   value: {
-    value: number;
-    unit: string;
+    value: number | string;
+    customValue?: number;
   };
 };

@@ -6,6 +6,7 @@ const modalSlice = createSlice({
     isEditModalOpen: false,
     isAddModalOpen: false,
     isRunTaskOpen: false,
+    isExecutedListOpen: false,
   },
   reducers: {
     openEditModal: (state) => {
@@ -25,6 +26,12 @@ const modalSlice = createSlice({
     },
     closeRunTaskModal: (state) => {
       state.isRunTaskOpen = false;
+    },
+    openExecutedListModal: (state) => {
+      state.isExecutedListOpen = true;
+    },
+    closeExecutedListModal: (state) => {
+      state.isExecutedListOpen = false;
     },
   },
 });

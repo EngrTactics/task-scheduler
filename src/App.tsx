@@ -1,13 +1,13 @@
-import EditTask from "./EditTask";
-import TaskList from "./TaskList";
+import EditTask from "./components/EditTask";
+import TaskList from "./components/TaskList";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "./redux/store";
 import { AnimatePresence } from "framer-motion";
-import AddTask from "./AddTask";
-import { Plus, PlusCircle } from "lucide-react";
-import { addTask } from "./redux/tasks/tasksAction";
-import { openAddModal } from "./redux/modal/modalAction";
-import TaskRunModal from "./TaskRunModal";
+import AddTask from "./components/AddTask";
+import { PlusCircle } from "lucide-react";
+import { openAddModal, openExecutedListModal } from "./redux/modal/modalAction";
+import TaskRunModal from "./components/TaskRunModal";
+import ExecutedTaskList from "./components/ExecutedTaskList";
 
 function App() {
   const dispatch = useDispatch();
@@ -20,18 +20,32 @@ function App() {
   const isRunTaskOpen = useSelector((state: RootState) => {
     return state.modal.isRunTaskOpen;
   });
+  const isExecutedListOpen = useSelector((state: RootState) => {
+    return state.modal.isExecutedListOpen;
+  });
   const runningTask = useSelector((state: RootState) => {
     return state.tasks.runningTask;
+  });
+  const taskToEdit = useSelector((state: RootState) => {
+    return state.tasks.taskToEdit;
   });
 
   return (
     <main className="bg-[F8FAFC] text-[#2c2e2e]">
-      <section className="container mx-auto min-h-screen w-[550px] p-5">
+      <section className="container mx-auto min-h-screen p-5 md:w-[550px]">
         <h1 className="text-center text-3xl font-bold capitalize">
           Message Scheduler
         </h1>
         <div className="mt-10">
-          <div className="flex justify-end">
+          <div className="flex items-baseline justify-between">
+            <button
+              onClick={() => {
+                dispatch(openExecutedListModal());
+              }}
+              className="text-blue-600 hover:text-blue-800"
+            >
+              View Executed Tasks List
+            </button>
             <button
               onClick={() => {
                 dispatch(openAddModal());
@@ -41,10 +55,10 @@ function App() {
               <PlusCircle /> <span>Add Task</span>
             </button>
           </div>
-          {/* <div className="mt-2 overflow-hidden rounded-md bg-white shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)]"> */}
+
           <TaskList />
           <AnimatePresence mode="wait">
-            {isEditModalOpen && <EditTask />}
+            {isEditModalOpen && taskToEdit && <EditTask task={taskToEdit} />}
           </AnimatePresence>
           <AnimatePresence mode="wait">
             {isAddModalOpen && <AddTask />}
@@ -53,6 +67,9 @@ function App() {
             {isRunTaskOpen && runningTask && (
               <TaskRunModal task={runningTask} />
             )}
+          </AnimatePresence>
+          <AnimatePresence mode="wait">
+            {isExecutedListOpen && <ExecutedTaskList />}
           </AnimatePresence>
         </div>
         {/* </div> */}

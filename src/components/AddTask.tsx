@@ -1,6 +1,6 @@
 import { Separator } from "@/components/ui/separator";
-import { Input } from "./components/ui/input";
-import { Label } from "./components/ui/label";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
 import {
   Form,
   FormControl,
@@ -8,36 +8,32 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "./components/ui/form";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "./components/ui/popover";
+} from "./ui/form";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { v4 as uuidv4 } from "uuid";
-import { Button } from "./components/ui/button";
+import { Button } from "./ui/button";
 import { CalendarIcon, PlusCircle } from "lucide-react";
-import { Calendar } from "./components/ui/calender";
+import { Calendar } from "./ui/calender";
 import { format } from "date-fns";
-import { cn } from "./lib/utils";
+import { cn } from "../lib/utils";
 import { useForm } from "react-hook-form";
-import { Textarea } from "./components/ui/textarea";
+import { Textarea } from "./ui/textarea";
 import { useState } from "react";
-import { validationSchema } from "./validations/validation";
+import { validationSchema } from "../validations/validation";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "./components/ui/select";
-import { RadioGroup, RadioGroupItem } from "./components/ui/radio-group";
+} from "./ui/select";
+import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { motion } from "framer-motion";
-import { closeAddModal } from "./redux/modal/modalAction";
+import { closeAddModal } from "../redux/modal/modalAction";
 import { useDispatch } from "react-redux";
-import { addTask } from "./redux/tasks/tasksAction";
+import { addTask, updatePendingAndPastTask } from "../redux/tasks/tasksAction";
 
-import { Switch } from "./components/ui/switch";
+import { Switch } from "./ui/switch";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 const AddTask = () => {
@@ -50,7 +46,8 @@ const AddTask = () => {
     repeat: "",
     repeatActive: false,
     platform: "",
-    finalDate: null,
+    finalDate: undefined,
+    custom: 0,
   };
   const form = useForm({
     mode: "onTouched",
@@ -82,13 +79,15 @@ const AddTask = () => {
         active: data.repeatActive,
         value: {
           value: data.repeatActive ? data.repeat : null,
-          unit: "days",
+          customValue: data.custom,
         },
       },
       finalDate: data.finalDate,
-      runDate: data.scheduleDate.toISOString(),
+      runDate: data.scheduleDate,
     };
     dispatch(addTask(taskToAdd as any));
+    dispatch(updatePendingAndPastTask());
+
     dispatch(closeAddModal());
   };
 
@@ -98,9 +97,6 @@ const AddTask = () => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
-      // onClick={() => {
-      //   dispatch(closeAddModal());
-      // }}
       className="fixed inset-0 z-30 flex items-center justify-center bg-black/65 backdrop-blur"
     >
       <motion.div
@@ -108,18 +104,14 @@ const AddTask = () => {
         animate={{ scale: 1 }}
         exit={{ scale: 0.2 }}
         transition={{ duration: 0.3 }}
-        className="max-h-[97%] w-[400px] overflow-scroll rounded-md bg-white p-4"
-        // onClick={(e) => {
-        //   e.stopPropagation();
-        //   e.preventDefault();
-        // }}
+        className="max-h-[97%] max-w-[420px] overflow-scroll rounded-md bg-white p-4 md:w-[420px]"
       >
         <h1 className="mb-1 font-bold">Add Task</h1>
         <Separator className="mx-auto" />
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(handleSubmit)}
-            className="px-4 pt-4"
+            className="pt-4 md:px-4"
           >
             <div className="flex flex-col space-y-4">
               <div className="flex gap-4 *:grow *:basis-0">
@@ -231,15 +223,15 @@ const AddTask = () => {
                   ))}
                   <input
                     id="recipient"
-                    className="w-36 rounded-md border border-gray-400 px-3 py-1 outline-none hover:border-gray-600 focus:border-gray-800"
+                    className="w-32 rounded-md border border-gray-400 px-3 py-1 outline-none hover:border-gray-600 focus:border-gray-800"
                     value={recipient}
                     onChange={(e) => setRecipient(e.target.value)}
                   />
                   <button
-                    className="top-5 transition-all duration-100 hover:scale-105 active:scale-100"
+                    className="rounded-full border-2 border-slate-800 bg-slate-800 px-2 py-0.5 text-white hover:bg-slate-900"
                     onClick={addRecipient}
                   >
-                    <PlusCircle />
+                    Add
                   </button>
                 </div>
               </div>
@@ -308,10 +300,27 @@ const AddTask = () => {
                             <div className="flex items-center gap-x-2">
                               <RadioGroupItem value="custom" id="custom" />
                               <Label
-                                className="text-sm font-light"
+                                className="flex items-center gap-1 text-sm font-light"
                                 htmlFor="custom"
                               >
-                                Every (x) days
+                                <span>Every</span>{" "}
+                                <FormField
+                                  control={form.control}
+                                  name="custom"
+                                  render={({ field }) => (
+                                    <FormItem className="">
+                                      <FormControl>
+                                        <Input
+                                          className="my-0 h-8 w-16 py-0 text-sm"
+                                          type="number"
+                                          {...field}
+                                        />
+                                      </FormControl>
+                                      <FormMessage className="text-xs" />
+                                    </FormItem>
+                                  )}
+                                />
+                                minutes
                               </Label>
                             </div>
                           </RadioGroup>
