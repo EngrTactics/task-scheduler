@@ -1,6 +1,6 @@
 // redux/store.ts
 import { configureStore } from "@reduxjs/toolkit";
-import modalReducer from "./edit-modal/modalSlice";
+import modalReducer from "./modal/modalSlice";
 import taskReducer from "./tasks/tasksSlice";
 
 const store = configureStore({

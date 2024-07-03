@@ -4,9 +4,13 @@ import { motion, AnimatePresence, useCycle } from "framer-motion";
 import { cn } from "./lib/utils";
 import { Task } from "./types";
 import { useDispatch } from "react-redux";
-import { openEditModal } from "./redux/edit-modal/modalAction";
+import { openEditModal, openRunTaskModal } from "./redux/modal/modalAction";
 import { format } from "date-fns";
-import { deleteTask } from "./redux/tasks/tasksAction";
+import {
+  deleteTask,
+  updatePendingAndPastTask,
+} from "./redux/tasks/tasksAction";
+import { setRunningTask } from "./redux/tasks/tasksSlice";
 
 const container = {
   hidden: { height: 0 },
@@ -18,10 +22,7 @@ const container = {
     },
   },
 };
-const item = {
-  hidden: { height: 0 },
-  show: { height: 1 },
-};
+
 const platformColor = {
   whatsapp: "border-l-green-500",
   telegram: "border-l-blue-500",
@@ -47,6 +48,8 @@ const TaskItem = ({ task }: TaskProps) => {
   // Schedule the task
   if (delay > 0) {
     setTimeout(() => {
+      dispatch(setRunningTask(task));
+      dispatch(openRunTaskModal());
       console.log(`Running task ${task.id}`);
     }, delay);
   } else {
@@ -168,6 +171,7 @@ const TaskItem = ({ task }: TaskProps) => {
               <button
                 onClick={() => {
                   dispatch(deleteTask(task.id));
+                  dispatch(updatePendingAndPastTask());
                 }}
                 className="rounded-full bg-rose-700 px-5 py-1.5 text-white hover:bg-rose-800"
               >

@@ -6,7 +6,8 @@ import { AnimatePresence } from "framer-motion";
 import AddTask from "./AddTask";
 import { Plus, PlusCircle } from "lucide-react";
 import { addTask } from "./redux/tasks/tasksAction";
-import { openAddModal } from "./redux/edit-modal/modalAction";
+import { openAddModal } from "./redux/modal/modalAction";
+import TaskRunModal from "./TaskRunModal";
 
 function App() {
   const dispatch = useDispatch();
@@ -15,6 +16,12 @@ function App() {
   });
   const isAddModalOpen = useSelector((state: RootState) => {
     return state.modal.isAddModalOpen;
+  });
+  const isRunTaskOpen = useSelector((state: RootState) => {
+    return state.modal.isRunTaskOpen;
+  });
+  const runningTask = useSelector((state: RootState) => {
+    return state.tasks.runningTask;
   });
 
   return (
@@ -41,6 +48,11 @@ function App() {
           </AnimatePresence>
           <AnimatePresence mode="wait">
             {isAddModalOpen && <AddTask />}
+          </AnimatePresence>
+          <AnimatePresence mode="wait">
+            {isRunTaskOpen && runningTask && (
+              <TaskRunModal task={runningTask} />
+            )}
           </AnimatePresence>
         </div>
         {/* </div> */}

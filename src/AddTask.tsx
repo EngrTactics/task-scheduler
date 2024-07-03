@@ -23,7 +23,7 @@ import { cn } from "./lib/utils";
 import { useForm } from "react-hook-form";
 import { Textarea } from "./components/ui/textarea";
 import { useState } from "react";
-import { z } from "zod";
+import { validationSchema } from "./validations/validation";
 import {
   Select,
   SelectContent,
@@ -33,37 +33,24 @@ import {
 } from "./components/ui/select";
 import { RadioGroup, RadioGroupItem } from "./components/ui/radio-group";
 import { motion } from "framer-motion";
-import { closeAddModal } from "./redux/edit-modal/modalAction";
+import { closeAddModal } from "./redux/modal/modalAction";
 import { useDispatch } from "react-redux";
 import { addTask } from "./redux/tasks/tasksAction";
-import { Task } from "./types";
+
 import { Switch } from "./components/ui/switch";
 import { zodResolver } from "@hookform/resolvers/zod";
-
-const validationSchema = z.object({
-  time: z
-    .string()
-    .min(1, "Run time is required")
-    .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Run time must be in HH:mm format")
-    .refine((runTime) => {
-      const now = new Date();
-      const runTimeDate = new Date(now.toDateString() + " " + runTime);
-      return runTimeDate.getTime() >= now.getTime();
-    }, "Time cannot be in the past"),
-  messageTitle: z.string().nonempty("Message title is required"),
-});
 
 const AddTask = () => {
   const defaultValues = {
     time: "",
-    scheduleDate: new Date().setHours(0, 0, 0, 0),
+    scheduleDate: new Date(),
     messageTitle: "",
     message: "",
     recipients: [""],
     repeat: "",
     repeatActive: false,
     platform: "",
-    finalDate: new Date(),
+    finalDate: null,
   };
   const form = useForm({
     mode: "onTouched",
@@ -86,7 +73,6 @@ const AddTask = () => {
     console.log(data);
     const taskToAdd = {
       id: uuidv4(),
-      time: data.time,
       title: data.messageTitle,
       message: data.message,
       platform: data.platform,
@@ -99,7 +85,7 @@ const AddTask = () => {
           unit: "days",
         },
       },
-      finalDate: data.finalDate.toISOString(),
+      finalDate: data.finalDate,
       runDate: data.scheduleDate.toISOString(),
     };
     dispatch(addTask(taskToAdd as any));
@@ -122,7 +108,7 @@ const AddTask = () => {
         animate={{ scale: 1 }}
         exit={{ scale: 0.2 }}
         transition={{ duration: 0.3 }}
-        className="max-h-screen w-[400px] overflow-scroll rounded-md bg-white p-4"
+        className="max-h-[97%] w-[400px] overflow-scroll rounded-md bg-white p-4"
         // onClick={(e) => {
         //   e.stopPropagation();
         //   e.preventDefault();
@@ -169,8 +155,8 @@ const AddTask = () => {
                                   !field.value && "text-muted-foreground",
                                 )}
                               >
-                                {field.value ==
-                                new Date().setHours(0, 0, 0, 0) ? (
+                                {field.value.getDate() ==
+                                new Date().getDate() ? (
                                   <span>Today</span>
                                 ) : field.value ? (
                                   format(field.value, "PPP")
@@ -206,10 +192,11 @@ const AddTask = () => {
                 name="messageTitle"
                 render={({ field }) => (
                   <FormItem className="">
-                    <Label className="text-sm">Message Title</Label>
+                    <FormLabel className="text-sm">Message Title</FormLabel>
                     <FormControl>
                       <Input type="text" {...field} />
                     </FormControl>
+                    <FormMessage className="text-xs" />
                   </FormItem>
                 )}
               />
@@ -244,7 +231,7 @@ const AddTask = () => {
                   ))}
                   <input
                     id="recipient"
-                    className="min-w-20 rounded-md border border-gray-400 px-3 py-1 outline-none hover:border-gray-600 focus:border-gray-800"
+                    className="w-36 rounded-md border border-gray-400 px-3 py-1 outline-none hover:border-gray-600 focus:border-gray-800"
                     value={recipient}
                     onChange={(e) => setRecipient(e.target.value)}
                   />
@@ -368,6 +355,7 @@ const AddTask = () => {
                             </Select>
                           </FormControl>
                         </div>
+                        <FormMessage className="text-xs" />
                       </FormItem>
                     )}
                   />
@@ -436,6 +424,7 @@ const AddTask = () => {
                 type="submit"
                 // onClick={(e) => {
                 //   e.preventDefault();
+                //   console.log(form.formState.errors);
                 // }}
                 className="rounded-full border-2 border-slate-800 bg-slate-800 px-5 py-1 text-white hover:bg-slate-900"
               >

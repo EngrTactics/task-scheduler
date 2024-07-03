@@ -26,7 +26,7 @@ import {
 import { RadioGroup, RadioGroupItem } from "./components/ui/radio-group";
 import { motion } from "framer-motion";
 import { useDispatch } from "react-redux";
-import { closeEditModal } from "./redux/edit-modal/modalAction";
+import { closeEditModal } from "./redux/modal/modalAction";
 
 const EditTask = () => {
   const form = useForm();
