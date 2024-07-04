@@ -10,9 +10,9 @@ import {
   FormMessage,
 } from "./ui/form";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import { v4 as uuidv4 } from "uuid";
+
 import { Button } from "./ui/button";
-import { CalendarIcon, PlusCircle } from "lucide-react";
+import { CalendarIcon } from "lucide-react";
 import { Calendar } from "./ui/calender";
 import { format } from "date-fns";
 import { cn } from "../lib/utils";
@@ -29,9 +29,13 @@ import {
 } from "./ui/select";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { motion } from "framer-motion";
-import { closeAddModal, closeEditModal } from "../redux/modal/modalAction";
+import { closeEditModal } from "../redux/modal/modalAction";
 import { useDispatch } from "react-redux";
-import { editTask, updatePendingAndPastTask } from "../redux/tasks/tasksAction";
+import {
+  editTask,
+  loadTasks,
+  updatePendingAndPastTask,
+} from "../redux/tasks/tasksAction";
 
 import { Switch } from "./ui/switch";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -47,7 +51,7 @@ const EditTask = ({ task }: { task: Task }) => {
     repeat: task.repeat.active ? task.repeat.value.value : null,
     repeatActive: task.repeat.active,
     platform: task.platform,
-    finalDate: task.finalDate,
+    finalDate: !!task.finalDate ? new Date(task.finalDate) : undefined,
     custom: task.repeat.value.customValue,
   };
   const form = useForm({
@@ -58,7 +62,7 @@ const EditTask = ({ task }: { task: Task }) => {
   const dispatch = useDispatch();
   const [recipient, setRecipient] = useState<string>();
   const [recipients, setRecipients] = useState<string[]>([]);
-  const [repeatActive, setRepeatActive] = useState<boolean>(true);
+  const [repeatActive, setRepeatActive] = useState<boolean>(task.repeat.active);
   const addRecipient = (e: any) => {
     e.preventDefault();
     if (recipient) {
@@ -69,6 +73,7 @@ const EditTask = ({ task }: { task: Task }) => {
   };
   const handleSubmit = (data: typeof defaultValues) => {
     console.log(data);
+    console.log(task.id);
     const updatedTask = {
       id: task.id,
       title: data.messageTitle,
@@ -86,9 +91,24 @@ const EditTask = ({ task }: { task: Task }) => {
       finalDate: data.finalDate,
       runDate: data.scheduleDate,
     };
-    dispatch(editTask(updatedTask as any));
+    console.log(updatedTask);
+    dispatch(
+      editTask({
+        ...updatedTask,
+        repeat: {
+          ...updatedTask.repeat,
+          value: {
+            ...updatedTask.repeat.value,
+            value:
+              updatedTask.repeat.value.value !== null
+                ? updatedTask.repeat.value.value
+                : "",
+          },
+        },
+      }),
+    );
+    dispatch(loadTasks());
     dispatch(updatePendingAndPastTask());
-
     dispatch(closeEditModal());
   };
 
@@ -381,7 +401,10 @@ const EditTask = ({ task }: { task: Task }) => {
                           <span className="font-thin italic">(optional)</span>
                         </FormLabel>
                         <Popover>
-                          <PopoverTrigger disabled={repeatActive} asChild>
+                          <PopoverTrigger
+                            disabled={!!task.finalDate && !repeatActive}
+                            asChild
+                          >
                             <FormControl>
                               <Button
                                 variant={"outline"}

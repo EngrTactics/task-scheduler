@@ -12,7 +12,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { v4 as uuidv4 } from "uuid";
 import { Button } from "./ui/button";
-import { CalendarIcon, PlusCircle } from "lucide-react";
+import { CalendarIcon } from "lucide-react";
 import { Calendar } from "./ui/calender";
 import { format } from "date-fns";
 import { cn } from "../lib/utils";

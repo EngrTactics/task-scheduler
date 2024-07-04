@@ -36,7 +36,7 @@ type TaskProps = {
 };
 
 const TaskItem = ({ task }: TaskProps) => {
-  const [intervalId, setIntervalId] = useState<number | undefined>();
+  const [intervalId, setIntervalId] = useState<number | undefined>(undefined);
   const [isOpen, toggleOpen] = useCycle(false, true);
   const dispatch = useDispatch();
 
@@ -63,7 +63,7 @@ const TaskItem = ({ task }: TaskProps) => {
   useEffect(() => {
     // Schedule the task
     if (delay > 0) {
-      let intervalId: number | undefined;
+      let id: number | undefined;
 
       if (task.repeat.active) {
         // If the task should repeat, use setTimeout to schedule the first run
@@ -73,14 +73,14 @@ const TaskItem = ({ task }: TaskProps) => {
           dispatch(openRunTaskModal());
           console.log(`Running task ${task.id}`, determineMs(task));
 
-          // Then use setInterval to schedule the repeating runs
-          intervalId = window.setInterval(() => {
+          //use setInterval to schdule repeating task
+          id = window.setInterval(() => {
             dispatch(setRunningTask(task));
             dispatch(openRunTaskModal());
             console.log(`Running task ${task.id}`, determineMs(task));
           }, determineMs(task));
 
-          setIntervalId(intervalId);
+          setIntervalId(id);
         }, delay);
       }
 
