@@ -1,4 +1,4 @@
-# Message Scheduler Project
+# Task Scheduler Project
 
 This is a React project bootstrapped with Vite. This is a guide on how to run it on your local machine
 
@@ -18,13 +18,13 @@ To get a local copy up and running follow these simple steps.
 1. **Clone the repository:**
 
    ```sh
-   git clone https://github.com/yourusername/your-repo-name.git
+   git clone https://github.com/EngrTactics/task-scheduler.git
    ```
 
 2. **Navigate to the project directory:**
 
    ```sh
-   cd your-repo-name
+   cd task-scheduler
    ```
 
 3. **Install dependencies:**
