@@ -44,7 +44,7 @@ const TaskRunModal = ({ task }: { task: Task }) => {
         transition={{ duration: 0.3 }}
         className="max-h-[97%] w-[400px] overflow-scroll rounded-md bg-white p-4 text-center"
       >
-        <h1 className="mb-1 font-bold">
+        <h1 className="mb-1 font-semibold">
           {isLoading ? (
             <span>Task Running ...</span>
           ) : (
@@ -58,7 +58,7 @@ const TaskRunModal = ({ task }: { task: Task }) => {
         <p className="mt-4">
           {" "}
           {isLoading ? <span>Sending</span> : <span>Sent</span>}{" "}
-          <span className="font-bold">{task.title}</span> to
+          <span className="font-semibold">{task.title}</span> to
           {task.recipients.join()} via{" "}
           <span className="capitalize">{task.platform}</span>
         </p>

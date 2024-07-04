@@ -106,7 +106,7 @@ const AddTask = () => {
         transition={{ duration: 0.3 }}
         className="max-h-[97%] max-w-[420px] overflow-scroll rounded-md bg-white p-4 md:w-[420px]"
       >
-        <h1 className="mb-1 font-bold">Add Task</h1>
+        <h1 className="mb-1 font-semibold">Add Task</h1>
         <Separator className="mx-auto" />
         <Form {...form}>
           <form

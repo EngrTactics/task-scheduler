@@ -25,7 +25,7 @@ const ExecutedTaskList = () => {
         className="max-h-[97%] max-w-[420px] overflow-scroll rounded-md bg-white p-4 md:w-[420px]"
       >
         <div className="my-1 flex items-center justify-between">
-          <h1 className="text-base font-bold">Executed Tasks</h1>
+          <h1 className="text-base font-semibold">Executed Tasks</h1>
           <button
             onClick={(e) => {
               e.preventDefault();
@@ -59,7 +59,7 @@ const ExecutedTaskList = () => {
             </tbody>
           </table>
         ) : (
-          <div className="my-10 text-center font-bold">
+          <div className="my-10 text-center font-semibold">
             You don't have any executed tasks yet
           </div>
         )}

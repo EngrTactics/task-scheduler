@@ -31,7 +31,7 @@ function App() {
   });
 
   return (
-    <main className="bg-[F8FAFC] text-[#2c2e2e]">
+    <main className="font-poppins bg-[F8FAFC] text-[#2c2e2e]">
       <section className="container mx-auto min-h-screen p-5 md:w-[550px]">
         <h1 className="text-center text-3xl font-bold capitalize">
           Message Scheduler
@@ -50,7 +50,7 @@ function App() {
               onClick={() => {
                 dispatch(openAddModal());
               }}
-              className="flex items-center gap-2 rounded-full bg-blue-500 py-2 pl-3 pr-5 font-bold text-white hover:bg-blue-900"
+              className="flex items-center gap-2 rounded-full bg-blue-500 py-2 pl-3 pr-5 font-semibold text-white hover:bg-blue-900"
             >
               <PlusCircle /> <span>Add Task</span>
             </button>

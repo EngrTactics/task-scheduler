@@ -46,7 +46,7 @@ const TaskList = () => {
       {/* Task list haading */}
       <div
         className={
-          "my-4 flex items-center justify-between rounded-md border-l-2 px-4 py-2 font-bold shadow-custom"
+          "my-4 flex items-center justify-between rounded-md border-l-2 px-4 py-2 font-semibold shadow-custom"
         }
       >
         <div className="flex items-center gap-4">
@@ -62,7 +62,7 @@ const TaskList = () => {
       {sortedTasks.length > 0 ? (
         Object.entries(tasksByDate).map(([date, tasks]) => (
           <React.Fragment key={date}>
-            <div className="mt-2 px-2 py-2 font-bold">
+            <div className="mt-2 px-2 py-2 font-semibold">
               {format(new Date(date), "MMMM do")}
             </div>
             <div
@@ -88,7 +88,7 @@ const TaskList = () => {
       ) : (
         <div className="flex flex-col items-center justify-center py-10">
           <img src={noTask} className="w-32" alt="" />
-          <p className="mt-5 text-center font-bold">
+          <p className="mt-5 text-center font-semibold">
             You don't have any pending task,
             <br /> click "Add Task" to get started
           </p>
@@ -96,7 +96,7 @@ const TaskList = () => {
             onClick={() => {
               dispatch(openAddModal());
             }}
-            className="mt-5 flex items-center gap-2 rounded-full bg-blue-500 py-2 pl-3 pr-5 font-bold text-white hover:bg-blue-900"
+            className="mt-5 flex items-center gap-2 rounded-full bg-blue-500 py-2 pl-3 pr-5 font-semibold text-white hover:bg-blue-900"
           >
             <PlusCircle /> <span>Add Task</span>
           </button>

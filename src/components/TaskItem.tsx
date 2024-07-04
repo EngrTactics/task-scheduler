@@ -107,7 +107,7 @@ const TaskItem = ({ task }: TaskProps) => {
       >
         <div className="flex items-center gap-4">
           {/* task time */}
-          <div className="font-bold">{task.runTime}</div>
+          <div className="font-semibold">{task.runTime}</div>
           <Separator orientation="vertical" className="h-5" />
           {/* message title */}
           <div>{task.title}</div>
@@ -116,7 +116,7 @@ const TaskItem = ({ task }: TaskProps) => {
           {task.repeat.active ? (
             <Repeat size={18} />
           ) : (
-            <div className="text-slate-00 flex h-4 w-4 items-center justify-center rounded-full border-2 border-slate-800 text-[10px] font-bold">
+            <div className="text-slate-00 flex h-4 w-4 items-center justify-center rounded-full border-2 border-slate-800 text-[10px] font-semibold">
               1
             </div>
           )}
@@ -148,22 +148,22 @@ const TaskItem = ({ task }: TaskProps) => {
             <div className="p-4">
               <div className="flex flex-col gap-3">
                 <div className="flex items-center gap-2">
-                  <div className="font-bold">Title:</div>
+                  <div className="font-semibold">Title:</div>
                   <p>{task.title}</p>
                 </div>
                 <div>
-                  <div className="font-bold">Message:</div>
+                  <div className="font-semibold">Message:</div>
                   <div className="mt-2 rounded-md border p-4">
                     {task.message}
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="font-bold">Platform:</div>
+                    <div className="font-semibold">Platform:</div>
                     <p className="capitalize text-green-900">{task.platform}</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="font-bold">Recipient:</div>
+                    <div className="font-semibold">Recipient:</div>
                     <div className="flex max-w-40">
                       <p className="w-full overflow-hidden text-ellipsis text-nowrap">
                         {task && task.recipients && task.recipients.length > 0
@@ -179,17 +179,17 @@ const TaskItem = ({ task }: TaskProps) => {
             <div className="p-4">
               <div className="flex flex-wrap items-center justify-between text-sm">
                 <div className="flex items-center gap-2">
-                  <div className="font-bold">Runtime:</div>
+                  <div className="font-semibold">Runtime:</div>
                   <p>{format(new Date(runTime), "MMMM do")}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="font-bold">Repeat:</div>
+                  <div className="font-semibold">Repeat:</div>
                   <p className="capitalize">
                     {task.repeat.active ? task.repeat.value.value : "None"}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="font-bold">Final Date:</div>
+                  <div className="font-semibold">Final Date:</div>
                   <p>
                     {task.finalDate ? format(task.finalDate, "MMMM do") : "N/A"}
                   </p>
