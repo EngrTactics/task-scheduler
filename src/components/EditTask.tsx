@@ -72,8 +72,6 @@ const EditTask = ({ task }: { task: Task }) => {
     }
   };
   const handleSubmit = (data: typeof defaultValues) => {
-    console.log(data);
-    console.log(task.id);
     const updatedTask = {
       id: task.id,
       title: data.messageTitle,
@@ -91,7 +89,6 @@ const EditTask = ({ task }: { task: Task }) => {
       finalDate: data.finalDate,
       runDate: data.scheduleDate,
     };
-    console.log(updatedTask);
     dispatch(
       editTask({
         ...updatedTask,
@@ -455,10 +452,6 @@ const EditTask = ({ task }: { task: Task }) => {
               </button>
               <button
                 type="submit"
-                // onClick={(e) => {
-                //   e.preventDefault();
-                //   console.log(form.formState.errors);
-                // }}
                 className="rounded-full border-2 border-slate-800 bg-slate-800 px-5 py-1 text-white hover:bg-slate-900"
               >
                 Save

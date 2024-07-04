@@ -32,6 +32,7 @@ const TaskList = () => {
     );
   });
 
+  // an object to group tasks by date
   const tasksByDate = groupBy(sortedTasks, (task: any) =>
     task.runDate.toDateString(),
   );
@@ -39,7 +40,6 @@ const TaskList = () => {
   useEffect(() => {
     dispatch(loadTasks());
     dispatch(updatePendingAndPastTask());
-    console.log(tasks);
   }, [dispatch]);
   return (
     <div className="flex flex-col bg-white">
@@ -60,6 +60,7 @@ const TaskList = () => {
       </div>
 
       {sortedTasks.length > 0 ? (
+        // Iterate over the tasksByDate object.
         Object.entries(tasksByDate).map(([date, tasks]) => (
           <React.Fragment key={date}>
             <div className="mt-2 px-2 py-2 font-semibold">

@@ -31,10 +31,8 @@ const tasksSlice = createSlice({
       );
       if (index !== -1) {
         state.tasks[index] = action.payload;
-        console.log(state.tasks[index]);
         localStorage.setItem("tasks", JSON.stringify(state.tasks));
       } else {
-        console.log(index);
       }
     },
     updateTaskToEdit: (state, action: PayloadAction<Task>) => {

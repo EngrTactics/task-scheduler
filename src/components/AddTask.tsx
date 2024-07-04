@@ -67,7 +67,6 @@ const AddTask = () => {
     }
   };
   const handleSubmit = (data: typeof defaultValues) => {
-    console.log(data);
     const taskToAdd = {
       id: uuidv4(),
       title: data.messageTitle,
@@ -431,10 +430,6 @@ const AddTask = () => {
               </button>
               <button
                 type="submit"
-                // onClick={(e) => {
-                //   e.preventDefault();
-                //   console.log(form.formState.errors);
-                // }}
                 className="rounded-full border-2 border-slate-800 bg-slate-800 px-5 py-1 text-white hover:bg-slate-900"
               >
                 Add Task

@@ -71,13 +71,11 @@ const TaskItem = ({ task }: TaskProps) => {
           // Run the task
           dispatch(setRunningTask(task));
           dispatch(openRunTaskModal());
-          console.log(`Running task ${task.id}`, determineMs(task));
 
           //use setInterval to schdule repeating task
           id = window.setInterval(() => {
             dispatch(setRunningTask(task));
             dispatch(openRunTaskModal());
-            console.log(`Running task ${task.id}`, determineMs(task));
           }, determineMs(task));
 
           setIntervalId(id);
@@ -99,6 +97,7 @@ const TaskItem = ({ task }: TaskProps) => {
       }}
       className="relative z-20 cursor-pointer bg-white"
     >
+      {/* Task item heading */}
       <div
         className={cn(
           "flex items-center justify-between border-l-2 p-4",
@@ -136,6 +135,7 @@ const TaskItem = ({ task }: TaskProps) => {
           </button>
         </div>
       </div>
+      {/* Task Details */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
